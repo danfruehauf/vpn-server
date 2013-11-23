@@ -57,6 +57,7 @@ class vpn-server::openvpn {
 			command => "/bin/cp -a `rpm -ql openvpn | grep /sample-keys$`/${title} ${openvpn::openvpn_conf_dir}/${title} && chmod 400 ${openvpn::openvpn_conf_dir}/${title}",
 			notify  => Service["openvpn@server.service"],
 			creates => "${openvpn::openvpn_conf_dir}/${title}",
+			require => Package[openvpn],
 		}
 	}
 

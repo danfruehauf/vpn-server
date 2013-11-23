@@ -24,6 +24,7 @@ class vpn-server::xl2tpd {
 		xl2tpd:
 			ensure  => running,
 			enable  => true,
+			provider => "systemd",
 			require => Package[xl2tpd];
 	}
 }
