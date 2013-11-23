@@ -24,6 +24,7 @@ class vpn-server::firewall {
 		iptables:
 			ensure  => running,
 			enable  => true,
+			start   => "/usr/bin/systemctl restart iptables",
 			require => Package[iptables];
 	}
 
