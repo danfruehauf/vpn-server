@@ -39,6 +39,7 @@ class vpn-server::openvpn {
 		owner   => root,
 		group   => root,
 		mode    => 0644,
+		require => Package[openvpn],
 		notify  => Service["openvpn@server.service"],
 	}
 
@@ -48,6 +49,7 @@ class vpn-server::openvpn {
 		owner  => root,
 		group  => root,
 		mode   => 0755,
+		require => Package[openvpn],
 		notify => Service["openvpn@server.service"],
 	}
 
@@ -55,9 +57,9 @@ class vpn-server::openvpn {
 	define openvpn_sample_key_file () {
 		exec { "${openvpn_conf_dir}/${title}":
 			command => "/bin/cp -a `rpm -ql openvpn | grep /sample-keys$`/${title} ${openvpn::openvpn_conf_dir}/${title} && chmod 400 ${openvpn::openvpn_conf_dir}/${title}",
+			require => Package[openvpn],
 			notify  => Service["openvpn@server.service"],
 			creates => "${openvpn::openvpn_conf_dir}/${title}",
-			require => Package[openvpn],
 		}
 	}
 

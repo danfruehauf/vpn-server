@@ -47,6 +47,7 @@ class vpn-server::firewall {
 	}
 
 	exec { "/usr/sbin/sysctl -p ${ipv4_forward_sysctl}":
+		require  => File[$ipv4_forward_sysctl],
 		provider => shell,
 		onlyif   => "[ `/usr/sbin/sysctl -n net.ipv4.ip_forward` -eq 0 ]",
 	}
