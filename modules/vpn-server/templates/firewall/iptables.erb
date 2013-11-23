@@ -1,0 +1,40 @@
+*nat
+:PREROUTING ACCEPT [5:388]
+:POSTROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [2:152]
+-A POSTROUTING -o eth0 -j MASQUERADE
+COMMIT
+*filter
+:OUTPUT ACCEPT [106:14856]
+:INPUT ACCEPT [0:0]
+-A INPUT -p udp -m multiport -i tap+ --dports domain -j ACCEPT
+-A INPUT -p udp -m multiport -i tun+ --dports domain -j ACCEPT
+-A INPUT -p udp -m multiport -i ppp+ --dports domain -j ACCEPT
+
+# L2TP
+-A INPUT -p udp -m multiport -m udp --dports l2tp -j ACCEPT
+
+# OpenVPN
+-A INPUT -p tcp -m state -m multiport --state NEW -m tcp --dports openvpn -j ACCEPT
+-A INPUT -p udp -m multiport -m udp --dports openvpn -j ACCEPT
+
+# PPTP
+-A INPUT -p tcp -m state -m multiport --state NEW -m tcp --dports pptp -j ACCEPT
+
+# SSH
+-A INPUT -p tcp -m state -m multiport --state NEW -m tcp --dports ssh -j ACCEPT
+
+-A INPUT -p ah -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p icmp --icmp-type 8 -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -j DROP
+:FORWARD ACCEPT [0:0]
+-A FORWARD -i tap+ -j ACCEPT
+-A FORWARD -o tap+ -j ACCEPT
+-A FORWARD -i tun+ -j ACCEPT
+-A FORWARD -o tun+ -j ACCEPT
+-A FORWARD -i ppp+ -j ACCEPT
+-A FORWARD -o ppp+ -j ACCEPT
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT

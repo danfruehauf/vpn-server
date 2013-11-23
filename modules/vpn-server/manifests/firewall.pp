@@ -1,4 +1,4 @@
-# == Class: vpn-server::xl2tpd
+# == Class: vpn-server::firewall
 #
 # Configures forwarding and firewall rules
 #
@@ -8,7 +8,7 @@
 #
 # === Examples
 #
-#  class { vpn-server::xl2tpd: }
+#  class { vpn-server::firewall: }
 #
 # === Authors
 #
@@ -18,12 +18,20 @@
 #
 # Copyright 2013 Dan Fruehauf
 #
-class vpn-server::xl2tpd {
-	if ! defined(Package[xl2tpd]) { package { xl2tpd: ensure => installed; } }
+class vpn-server::firewall {
+	if ! defined(Package[iptables]) { package { iptables: ensure => installed; } }
 	service {
-		xl2tpd:
+		iptables:
 			ensure  => running,
 			enable  => true,
-			require => Package[xl2tpd];
+			require => Package[iptables];
+	}
+
+	file { "/etc/sysconfig/iptables":
+		notify  => Service["iptables"],
+		content => template("vpn-server/firewall/iptables.erb"),
+		owner   => root,
+		group   => root,
+		mode    => 644,
 	}
 }

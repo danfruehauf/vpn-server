@@ -1,6 +1,5 @@
 name    'vpn-server'
 version '0.0.1'
-source 'UNKNOWN'
 author 'Dan Fruehauf'
 license 'Apache License, Version 2.0'
 summary 'VPN server'
