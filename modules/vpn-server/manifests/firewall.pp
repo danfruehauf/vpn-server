@@ -19,9 +19,9 @@
 # Copyright 2013 Dan Fruehauf
 #
 class vpn-server::firewall {
-	if ! defined(Package[iptables])          { package { iptables:         ensure => installed; } }
-	if ! defined(Package[iptables-utils])    { package { iptables-utils:   ensure => installed; } }
-	if ! defined(Package[iptables-services]) { package { iptables-service: ensure => installed; } }
+	if ! defined(Package[iptables])          { package { iptables:          ensure => installed; } }
+	if ! defined(Package[iptables-utils])    { package { iptables-utils:    ensure => installed; } }
+	if ! defined(Package[iptables-services]) { package { iptables-services: ensure => installed; } }
 	service {
 		iptables:
 			ensure  => running,
