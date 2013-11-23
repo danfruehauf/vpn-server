@@ -19,13 +19,15 @@
 # Copyright 2013 Dan Fruehauf
 #
 class vpn-server::firewall {
-	if ! defined(Package[iptables]) { package { iptables: ensure => installed; } }
+	if ! defined(Package[iptables])          { package { iptables:         ensure => installed; } }
+	if ! defined(Package[iptables-utils])    { package { iptables-utils:   ensure => installed; } }
+	if ! defined(Package[iptables-services]) { package { iptables-service: ensure => installed; } }
 	service {
 		iptables:
 			ensure  => running,
 			enable  => true,
 			start   => "/usr/bin/systemctl restart iptables",
-			require => Package[iptables];
+			require => [ Package[iptables], Package[iptables-services], Package[iptables-utils] ];
 	}
 
 	file { "/etc/sysconfig/iptables":
