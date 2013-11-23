@@ -1,0 +1,22 @@
+port 1194
+proto tcp
+dev tun
+omp-lzo
+cipher AES-256-CBC
+dh dh1024.pem
+server 10.1.0.0 255.255.255.0
+persist-key
+persist-tun
+status /etc/openvpn/openvpn-status.log 1
+status-version 1
+verb 1
+client-cert-not-required
+username-as-common-name
+duplicate-cn
+cert server.crt
+ca ca.crt
+key server.key
+push "redirect-gateway def1 bypass-dhcp"
+push "dhcp-option DNS 8.8.8.8"
+script-security 2
+auth-user-pass-verify auth-user.sh via-file
