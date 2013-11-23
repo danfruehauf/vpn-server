@@ -35,4 +35,17 @@ class vpn-server::firewall {
 		group   => root,
 		mode    => 644,
 	}
+
+	$ipv4_forward_sysctl = "/etc/sysctl.d/ipv4_forward"
+	file { $ipv4_forward_sysctl:
+		content => "net.ipv4.ip_forward = 1",
+		owner   => root,
+		group   => root,
+		mode    => 644,
+	}
+
+	exec { "/usr/sbin/sysctl -p ${ipv4_forward_sysctl}":
+		provider => shell,
+		onlyif   => "[ `/usr/sbin/sysctl -n net.ipv4.ip_forward` -eq 0 ]",
+	}
 }
