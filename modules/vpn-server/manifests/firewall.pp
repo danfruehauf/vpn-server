@@ -38,7 +38,7 @@ class vpn-server::firewall {
 		mode    => 644,
 	}
 
-	$ipv4_forward_sysctl = "/etc/sysctl.d/ipv4_forward"
+	$ipv4_forward_sysctl = "/etc/sysctl.d/ipv4_forward.conf"
 	file { $ipv4_forward_sysctl:
 		content => "net.ipv4.ip_forward = 1",
 		owner   => root,
