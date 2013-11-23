@@ -19,45 +19,52 @@
 # Copyright 2013 Dan Fruehauf
 #
 class vpn-server::openvpn {
+	$openvpn_conf_dir = "/etc/openvpn"
+
 	if ! defined(Package[openvpn]) { package { openvpn: ensure => installed; } }
+	if ! defined(Package[systemd]) { package { systemd: ensure => installed; } }
+
+	# use systemd for service management
 	service {
-		openvpn:
+		"openvpn@server.service":
 			ensure  => running,
 			enable  => true,
-			require => Package[openvpn];
+			provider => "systemd",
+			require => [ Package[openvpn] ];
 	}
 
-	file { "/etc/openvpn/server.conf":
+	# server configuration
+	file { "${openvpn_conf_dir}/server.conf":
 		content => template("vpn-server/openvpn/server.conf.erb"),
 		owner   => root,
 		group   => root,
 		mode    => 0644,
-		notify  => Service[openvpn],
+		notify  => Service["openvpn@server.service"],
 	}
 
-	file { "/etc/openvpn/auth-user.sh":
-		source  => "puppet:///modules/vpn-server/openvpn/auth-user.sh",
-		owner   => root,
-		group   => root,
-		mode    => 0755,
-		notify  => Service[openvpn],
+	# simplistic auth method
+	file { "${openvpn_conf_dir}/auth-user.sh":
+		source => "puppet:///modules/vpn-server/openvpn/auth-user.sh",
+		owner  => root,
+		group  => root,
+		mode   => 0755,
+		notify => Service["openvpn@server.service"],
 	}
 
 	# user sample configuration and keys
-	define openvpn_config_file ($src) {
-		$openvpn_conf_dir = "/etc/openvpn"
-
+	define openvpn_sample_key_file () {
 		exec { "${openvpn_conf_dir}/${title}":
-			command => "/bin/cp -a /usr/share/doc/openvpn-2.3.2/sample/${src}/${title} ${openvpn_conf_dir}/${title} && chmod 400 ${openvpn_conf_dir}/${title}",
-			notify  => Service[openvpn],
-			creates => "${openvpn_conf_dir}/${title}",
+			command => "/bin/cp -a `rpm -ql openvpn | grep /sample-keys$`/${title} ${openvpn::openvpn_conf_dir}/${title} && chmod 400 ${openvpn::openvpn_conf_dir}/${title}",
+			notify  => Service["openvpn@server.service"],
+			creates => "${openvpn::openvpn_conf_dir}/${title}",
 		}
 	}
 
-	# sample configuration
-	#openvpn_config_file { "server.conf": src => "sample-config-files" }
-	openvpn_config_file { "dh1024.pem":  src => "sample-keys" }
-	openvpn_config_file { "ca.crt":      src => "sample-keys" }
-	openvpn_config_file { "server.crt":  src => "sample-keys" }
-	openvpn_config_file { "server.key":  src => "sample-keys" }
+	# sample keys
+	openvpn_sample_key_file { [
+		"dh1024.pem",
+		"ca.crt",
+		"server.crt",
+		"server.key"
+	]: }
 }
