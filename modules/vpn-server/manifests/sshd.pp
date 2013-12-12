@@ -1,4 +1,4 @@
-# == Class: vpn-server::xl2tpd
+# == Class: vpn-server::sshd
 #
 # Configures a sshd VPN server
 #
